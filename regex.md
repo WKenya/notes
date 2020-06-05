@@ -38,3 +38,69 @@ Sample Linux command: `grep 'fooa*bar' regex01.txt`
 `.` - matches any __one__ character in a single position
 
 - EX: `foo.bar` matches 'fooabar', 'fooxbar', 'foocbar'
+
+### Wildcard Asterisk Combo
+
+`.*` - Zero or more occurrences of wildcard, which means zero or more occurrences of any character
+
+- EX: `foo.*bar` matches foobar, 'fooabcbar', 'foobxcbar', 'foozbar', but not 'barfoo'
+
+### Representing White spaces
+
+`\s` - represents white space.
+`\s*` - represents zero or more occurrences of whitespace
+
+- EX: `foo\s*bar` matches 'foo    bar'
+
+### Character classes
+
+`[abc]` - Character class. One of the characters inside the square brackets - a, b, or c. Represents only 1 character position.
+
+- EX: `[fcl]00` matches foo, hoo, loo, but not moo, or poo
+
+`[^abc]` - Any character __except__ any of the ones indie the square brackets, in a single position.
+
+- EX: `[^mh]oo` excludes moo, hoo, but includes foo, doo, loo, etc...
+
+### Character Classes with Ranges
+
+`[a-c]` - One of the characters falling in the range given in square brackets - a,b,c
+
+- Must be an ASCII value
+- Starting point value must be less than the ending point value
+
+- EX: `[j-m]oo` matches koo, loo, moo, and not boo or zoo
+
+`[a-cx]` - One of the characters falling in the range  __or__ any of the other choices given in square brackets - a,b,c, x
+
+- EX: `[j-mz]oo` matches koo, loo, moo, and zoo
+
+`[a-cA-Cx]` - One of the characters falling in one of the ranges __or__ any of the other choices given in square brackets - a,b,c,A,B,C,x
+
+- EX: `[j-mK-Lz]oo` matches joo,Koo, Loo, moo, and zoo
+
+### Escaping with backslash
+
+The following characters should be escaped with a backslash as these characters are reserved: `^$*.[()\`
+
+- EX: `x*\.y*` matches xxx.yy, xx.yyy, x.yy, but not xy, xxyy, etc...
+
+If a `.` is inside a character class, it does __not__ need to be escaped.
+
+- EX: `x[#:.]y` matches x#y, x:y, x.z, but not x&y or x%y
+
+If any of the characters `^` or `-` appear inside a character class, then they need to be escaped as they are reserved characters.
+
+- EX: `x[#:\^]y` matches x#y, x:y, and x^y
+- EX: `x[#\\\^]y` matches x#y, x\y, and x^y
+
+### Anchors
+
+`^` is a placeholder that signifies beginning of a line when not used us a character class. Outside, it is a placeholder for beginning of line.
+
+- EX: `^foo.*` matches 'foo bar baz', 'foo baz bar', but not 'bar foo baz'.
+
+`$` is a placeholder that signifies the end of a line
+
+- EX: `.*bar$` matches 'baz foo bar' and 'foo baz bar' but not 'bar foo baz'
+- EX: `^foo$` matches 'foo', and nothing else
