@@ -125,15 +125,11 @@ For Grep you need to use the -E option in Linux for the Extended set
 
 `a{m,}` represents exactly 'm' and beyond repetitions of whatever immediately precedes it.
 
-- EX: `^(ha){4,}$` matches 'ha' exactly 4 or more times
-
-`a{m,}` represents exactly 'm' and beyond repetitions of whatever immediately precedes it.
-
-- EX: `^(ha){4,}$` matches 'ha' exactly 4 or more times.
+- EX: `^(ha){4,}$` matches 'ha' 4 or more times
 
 `a{,n}` represents exactly 'n' or less repetitions of whatever immediately precedes it.
 
-- EX: `^(ha){,2}$` matches 'ha' exactly 2 or less times.
+- EX: `^(ha){,2}$` matches 'ha' up to and including 2 times.
 
 ### The Plus Repeater
 
@@ -152,3 +148,211 @@ For Grep you need to use the -E option in Linux for the Extended set
 `(a|b)` - represents either a or b, where a and b can be multi-character strings.
 
 - EX: `(log|ply)wood` matches logwood and plywood
+
+## Find and Replace with Capture Groups
+
+Cannot use `grep`, need to use `sed` on the command line.
+
+`sed -r 's/pattern/replacement/g' inputfile`
+
+- `-r` enables the POSIX extended set
+- `s` enables substitution
+- `g` enables this globally. Sed substitutes only the first match by default.
+
+
+### How to build a regex substitution
+
+1. Understand the requirement
+
+    - What needs to be replaced?
+    - What should be the replacement?
+
+2. Represent the patterns using regex. Enclose the pattern(s) that needs to be replaced with parentheses to segregate them into capture groups.
+
+3. Come up with a substitution string by using the captured pattern groups.
+
+4. Use a regex enabled find and replace engine to do the replacement.
+
+### The Monitor Problem
+
+Data is in format:
+
+- 1280x720
+- 1920x1080
+- 1600x900
+
+Need to transform to the following format:
+
+- 1280 pix by 720 pix
+
+Regex Pattern
+
+`([0-9]+)x([0-9]+)`
+
+Capture group 1 and 2 correspond to the data in the parentheses in order.
+
+Substitution pattern
+
+`\1 pix by \2 pix`
+
+Escape the capture groups using the  group numbers to substitute the data.
+
+Linux Command
+
+`sed -r 's/([0-9]+)x([0-9]+)/\1 pix by \2 pix/g' regex25.txt`
+
+### The First name Last name Problem
+
+Data is in format:
+
+- John Wallace
+- Martin Cook
+- Adam Smith
+
+Need to transform to the following format:
+
+- Wallace,John
+- Martin,Cook
+
+Regex Pattern
+
+`([a-zA-Z]+\s([a-zA-Z]+))`
+
+Substitution pattern
+
+`\2,\1`
+
+Linux Command
+
+`sed -r 's/([a-zA-Z])+\s([a-zA-Z]+))/\2,\1/g' regex26.txt`
+
+### The Clock Problem
+
+Data is in format:
+
+- 7:32
+- 6:12
+- 11:33
+
+Need to transform to the following format:
+
+- 32 mins past 7
+- 12 mins past 6
+- 33 mins past 11
+
+Regex Pattern
+
+`(1*[0-9]):([0-5][0-9])`
+
+Substitution pattern
+
+`\2 mins past \1`
+
+Linux Command
+
+`sed -r 's/(1*[0-9]):([0-5][0-9])/\2 mins past \1/g' regex27.txt`
+
+### The Phone Number Problem
+
+Data is in format:
+
+- 914.582.3013
+- 873.334.2589
+- 521.589.3147
+
+Need to transform to the following format:
+
+- xxx.xxx.3013
+- xxx.xxx.2589
+- xxx.xxx.3147
+
+Regex Pattern
+
+`[0-9]{3}\.[0-9]{3}\.([0-9]{4})`
+
+Substitution pattern
+
+`xxx.xxx.\1`
+
+Escaping is __not__ needed for replacement patterns, only search patterns
+
+Linux Command
+
+`sed -r 's/[0-9]{3}\.[0-9]{3}\.([0-9]{4})/xxx.xxx.\1/g' regex28.txt`
+
+### The Date Problem
+
+Data is in format:
+
+- Jan 5th 1987
+- Dec 26th 2010
+- Mar 2nd 1923
+
+Need to transform to the following format:
+
+- 5-Jan-87
+- 26-Dec-10
+- 2-Mar-23
+
+Regex Pattern
+
+`([a-zA-Z]{3})\s([0-9]{1,2}[a-z]{2}\s[0-9]{2}([0-9]{2}))`
+
+Substitution pattern
+
+`\2-\1-\3`
+
+Escaping is __not__ needed for replacement patterns, only search patterns
+
+Linux Command
+
+`sed -r 's/([a-zA-Z]{3})\s([0-9]{1,2}[a-z]{2}\s[0-9]{2}([0-9]{2}))/\2-\1-\3/g' regex29.txt`
+
+### Another Phone Number Problem
+
+Data is in format:
+
+- (914).582.3013
+- (873).334.2589
+- (521).589.3147
+
+Need to transform to the following format:
+
+- 914.582.3013
+- 873.334.2589
+- 521.589.3147
+
+Regex Pattern
+
+`\(([0-9]{3})\)(\.[0-9]{3}\.[0-9]{4})`
+
+Substitution pattern
+
+`\1\2`
+
+Escaping is __not__ needed for replacement patterns, only search patterns
+
+Linux Command
+
+`sed -r 's/\(([0-9]{3})\)(\.[0-9]{3}\.[0-9]{4})/\1\2/g' regex30.txt`
+
+### Email Challenge
+
+Data is in format:
+
+Include:
+
+- bob.123@gmail.com
+- alice-personal@yahoo.com
+- admin@cloud.guru
+- tom_business@amazon.ca
+
+Exclude:
+
+- george@yahoo
+- robert_at_gmail.com
+- steve austin@gmail.com
+
+Regex Pattern
+
+`^[a-zA-Z0-9_.-]+@[a-zA-Z]+\.[a-zA-Z]+$`
