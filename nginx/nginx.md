@@ -93,3 +93,25 @@ So if there is a request for `/images/cats.png`, nginx will append the root path
 ```nginx
 root /sites/demo
 ```
+
+Run `systemctl reload nginx` to prevent any downtime. If the configuration is wrong, the service will stay up with the old config.
+
+Run `nginx -t` to verify that the file is configured properly. 
+
+#### Types Context
+
+This context allows you to configure the mime type for files being requested.
+
+```nginx
+types {
+    text/html html;
+    text/css css;
+}
+```
+
+But there is an easier way. In `/etc/nginx/mime.types` there is a configuration file that already contains this info. We can import that into our current configuration. We can do this by using the `include` directive and point towards that file.
+
+```nginx 
+include mime.types;
+```
+
