@@ -115,3 +115,69 @@ But there is an easier way. In `/etc/nginx/mime.types` there is a configuration 
 include mime.types;
 ```
 
+### Location Blocks
+
+Location blocks use URIs to configure behavior for the given values. This is useful if you don't just want to serve a static file when a resource is requested.
+
+#### Prefix Match
+
+```nginx
+location /greet {
+    return 200 'Hello from NGINX /greet location';
+}
+```
+
+_Note_: This is a prefix match, meaning anything starting with /greet will be matched, including /greeting
+
+#### Exact Match
+
+To do an exact match, add an `=` between the location and URI.
+
+```nginx
+location = /greet {
+    return 200 'Hello from NGINX /greet location';
+}
+```
+
+#### Regex Match Case Sensative
+
+To do a regex match, add an `~` between the location and the regex field.
+
+_Note:_ This is case sensitive by default.
+
+```nginx
+location ~ /greet[0-9] {
+    return 200 'Hello from NGINX /greet location';
+}
+```
+
+#### Regex Match Case Insensitive
+
+To do a case insensitive match, add an asterisk next to the tilde.
+
+```nginx
+location ~* /greet[0-9] {
+    return 200 'Hello from NGINX /greet location';
+}
+```
+
+_Note_: nginx assigns priority to locations, with regex's taking higher priority over prefix matchers.
+
+#### Preferential Prefix
+
+To assign a higher precedence for a Prefix Match, add a `~^` to the location.
+
+```nginx
+location ^~ /Greet2 {
+    return 200 'Hello from NGINX /greet location';
+}
+```
+
+#### Priority of Matches
+
+1. Exact
+2. Preferential Prefix
+3. Regexes of both types, though the first block is prioritized it there are multiples
+3. Prefix match
+
+
