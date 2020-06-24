@@ -177,7 +177,5 @@ location ^~ /Greet2 {
 
 1. Exact
 2. Preferential Prefix
-3. Regexes of both types, though the first block is prioritized it there are multiples
-3. Prefix match
-
-
+3. Regexes of both types, though the first block in order is prioritized if there are multiple
+4. Prefix match
