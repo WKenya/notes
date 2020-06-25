@@ -237,3 +237,62 @@ if ( $date_local ~ 'Saturday|Sunday') {
 }
 ```
 
+### Rewrites and Redirects
+
+Both are methods for returning different content than originally specified from the URI.
+
+#### Rewrite
+
+Allow us to take a URI request and map it to a resource at a different URI internally.
+
+```nginx
+rewrite pattern URI;
+```
+
+```nginx
+rewrite ^/user/\w+ /greet;
+
+location /greet {
+    return 200 "Hello User";
+}
+```
+
+__Note__: When a URI is rewritten, it is completely reevaluated from the start as a new request. This means that rewrites require more resources server side when evaluating requests over redirects.
+
+##### Capture Groups
+
+You can use RegEx capture groups to capture parts of the original request URI.
+
+```nginx
+rewrite ^/user/(\w+) /greet/$1;
+
+location = /greet/john {
+    return 200 "Hello John";
+}
+```
+
+##### Last Flag
+
+This flag allows us to tell nginx to not rewrite a URI anymore. Useful if you have multiple rewrites that might clash.
+
+```nginx
+ rewrite ^/user/(\w+) /greet/$1 last;
+ ```
+
+#### Redirect
+
+Allows us to send a 300 style code back to indicate the resource is now somewhere else. Most Clients when then use the new URI to get the resource automatically.
+
+```nginx
+return 3** URI;
+```
+
+Ex:
+
+```nginx
+location /logo {
+    return 307 /thumb.png;
+}
+```
+
+_Note_: This URI can be relative or absolute. For `300s` we can provide a URI to redirect instead of a string like a `200`.
