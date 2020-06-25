@@ -296,3 +296,46 @@ location /logo {
 ```
 
 _Note_: This URI can be relative or absolute. For `300s` we can provide a URI to redirect instead of a string like a `200`.
+
+### Try-Files and Named Locations
+
+Can be used in the server context or location context.
+
+Allows nginx to look for resources in multiple locations __relative to the root__ directory, with the first one to exist being served back. The final argument rewrites (and reevaluation of) the request if the previous URIs fail to work.
+
+```nginx
+try_files path1 path2 finals;
+```
+
+Ex:
+
+```nginx
+server {
+    # etc...
+    root /sites/demo;
+
+    try_files /thumb.png /greet;
+}
+```
+
+This is typically used with variables to make it useful. The `$uri` variables allows the initial URI requested to be check first.
+
+```nginx
+try_files $uri /cat.png /greet /friendly_404;
+
+location /friendly_404 {
+    return 404 "Sorry, that file could not be found.";
+}
+```
+
+#### Named Locations
+
+Allows us to assign names to a location context. Apply an `@` on a location context, and then use that to reference it.
+
+```nginx
+try_files $uri /cat.png /greet @friendly_404;
+
+location @friendly_404 {
+    return 404 "Sorry, that file could not be found.";
+}
+```
