@@ -385,3 +385,42 @@ location /secure {
 ```
 
 Generally speaking, turn the access log off unless you know you need it as it is written to frequently. For more advanced configuration, see [here](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/).
+
+### Inheritance and Directive Types
+
+An nginx context inherits configurations from it's parents context. This means that the root will be inherited throughout cascading inheritances.
+
+```nginx
+
+server {
+    root /site/demo;
+
+    location foo {
+
+        # inherited root
+        # root /sites/demo
+    }
+}
+```
+
+There are 3 types of Directives:
+
+#### Standard Directive
+
+- Can only be declared once. A second declaration overrides the first.
+- Gets inherited by all child contexts
+- Child context can override inheritance be re-declaring directive
+- Ex: `root`
+
+#### Array Directive
+
+- Can be declared multiple times without overriding the previous settings
+- Gets inherited by all child contexts
+- Child context can override inheritance by re-declaring the directive.
+- Ex: `access_log`
+
+#### Action Directive
+
+- Invokes an action such as a rewrite or a redirect
+- Inheritance does not apply as the request is either stopped (redirect/response) or re-evaluated (rewrite).
+- Ex: `return`, `rewrite`, `try_files`
