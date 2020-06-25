@@ -96,7 +96,7 @@ root /sites/demo
 
 Run `systemctl reload nginx` to prevent any downtime. If the configuration is wrong, the service will stay up with the old config.
 
-Run `nginx -t` to verify that the file is configured properly. 
+Run `nginx -t` to verify that the file is configured properly.
 
 #### Types Context
 
@@ -111,7 +111,7 @@ types {
 
 But there is an easier way. In `/etc/nginx/mime.types` there is a configuration file that already contains this info. We can import that into our current configuration. We can do this by using the `include` directive and point towards that file.
 
-```nginx 
+```nginx
 include mime.types;
 ```
 
@@ -339,3 +339,49 @@ location @friendly_404 {
     return 404 "Sorry, that file could not be found.";
 }
 ```
+
+### Logging
+
+Inform us of what is happening to our server. There are two types of logs:
+
+#### Error Logs
+
+Anything that fails or didn't happen as expected.
+
+_Note:_ It is a common misconception that 404's log here. They typically do not, unless a resource is actually missing on the server. These should be properly handled through the nginx conf, rather than letting nginx search for the resource and failing.
+
+Any issues with the configuration file will also log out to this file.
+
+#### Access Logs
+
+Logs every request that happens on the server.
+
+We can create our own logs for special purposes.
+
+```nginx
+location /secure {
+    access_log /var/log/nginx/secure.access.log;
+    return 200 "Welcome to secure area.";
+}
+```
+
+_Note:_ Access to this location will now _not_ log to the regular access log. This can be enabled again by adding a specific access log directive to the normal directory.
+
+```nginx
+location /secure {
+    access_log /var/log/nginx/secure.access.log;
+    access_log /var/log/nginx/access.log;
+    return 200 "Welcome to secure area.";
+}
+```
+
+You can also disable logging for requests to reduce server load and processing.
+
+```nginx
+location /secure {
+    access_log off;
+    return 200 "Welcome to secure area.";
+}
+```
+
+Generally speaking, turn the access log off unless you know you need it as it is written to frequently. For more advanced configuration, see [here](https://docs.nginx.com/nginx/admin-guide/monitoring/logging/).
