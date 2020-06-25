@@ -179,3 +179,61 @@ location ^~ /Greet2 {
 2. Preferential Prefix
 3. Regexes of both types, though the first block in order is prioritized if there are multiple
 4. Prefix match
+
+### Variables
+
+There are two types of variables:
+
+#### Configuration Variables
+
+These are ones we set ourselves.
+
+```nginx
+set $var 'something';
+```
+
+#### Nginx Module variables
+
+Provided through Nginx or other modules.
+
+Most are listed here: [https://nginx.org/en/docs/varindex.html]([https://nginx.org/en/docs/varindex.html)
+
+```nginx
+$http, $uri, $args
+```
+
+`$host` is the request IP
+
+`$uri` is the resource path
+
+`$args` are the query string params
+
+- You can use `_` after the `$args` variable to specify which query parameter needed.
+- Ex: `$args_name` returns the value of the name param
+
+##### Setting Variables
+
+Use `set` syntax to set a value of a variable. Variables can be set to integers, strings, or booleans.
+
+- EX: `set $weekend 'No'`;
+
+#### Conditionals
+
+Useful for checking variables before proceeding through different sections of the nginx config.
+
+```nginx
+if ( $arg_apikey != 1234 ) {
+    return 401 "Incorrect API Key";
+}
+```
+
+_Note_: The use of conditionals inside locations blocks is [highly discouraged](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/). This can lead to unexpected behavior.
+
+Use `~` to perform a regex search on a variable.
+
+```nginx
+if ( $date_local ~ 'Saturday|Sunday') {
+    set $weekend 'Yes';
+}
+```
+
