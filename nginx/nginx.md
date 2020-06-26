@@ -412,6 +412,14 @@ There are 3 types of Directives:
 - Child context can override inheritance be re-declaring directive
 - Ex: `root`
 
+##### Index Directive
+
+When nginx receives a request to a directive, it will utilize the `index` directive to know what resource to serve by default. The directive takes multiple URIs in case one does not exist.
+
+```nginx
+index index.php index.html;
+```
+
 #### Array Directive
 
 - Can be declared multiple times without overriding the previous settings
@@ -424,3 +432,29 @@ There are 3 types of Directives:
 - Invokes an action such as a rewrite or a redirect
 - Inheritance does not apply as the request is either stopped (redirect/response) or re-evaluated (rewrite).
 - Ex: `return`, `rewrite`, `try_files`
+
+### PHP (Dynamic Services)
+
+We can utilize nginx as a reverse proxy to serve dynamic content via a PHP service. This will use the FastCGI binary protocol to communicate between nginx and php-fpm.
+
+To do this, we need to find the php-fpm socket the nginx will use to communicate to the service. We can find this by performing a search of the sockets on the system: `find / -name *php.sock`
+
+Using the name of the socket, we can now configure nginx to use this socket:
+
+```nginx
+location ~\.php$ {
+      # Pass php requests to the php-fpm service (fastcgi)
+      include fastcgi.conf;
+      fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+}
+```
+
+_Note:_ nginx provides a `fastcgi.conf` file for us in its default configuration location.
+
+When we try to serve a php file from, we end up getting a 502, and an error in the error logs due to there being a permissions error. This is due to the nginx worker having a user of `nobody`, a default, and php using `www-data`.
+
+We can fix this by adding the user to the configuration file:
+
+```nginx
+user www-data;
+```
