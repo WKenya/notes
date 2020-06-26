@@ -458,3 +458,43 @@ We can fix this by adding the user to the configuration file:
 ```nginx
 user www-data;
 ```
+
+### Worker Processes
+
+The Master process is the actual service that runs nginx. It spawns worker processes that listen and respond to requests. To add more workers we can add a directive to the configuration. This does not necessarily speed up nginx, as the number of processes is only as useful as the amount of core's the CPU has.
+
+```nginx
+worker_processes 2;
+```
+
+To find out the amount of cores on your CPU, run `nproc`. For more detailed info, run `lscpu`.
+
+However, it is better to set this value to `auto` instead, as nginx will then appropriately make as many workers as there are cores for the CPU, without you needing to specify that.
+
+```nginx
+worker_processes auto;
+```
+
+#### Worker Connections Directive
+
+This directive tells the worker process the maximum connections they can accept. This can be determined by running `ulimit -n`.
+
+```nginx
+events {
+    worker_connections 1024;
+}
+```
+
+Therefore the maximum connections an nginx server can request: `worker processes * worker connections = max connections`.
+
+_Note:_ These are the two most important directives for maximizing the performance of a nginx server.
+
+#### PID Directive
+
+You can also specify what `pid` file you want nginx to use without needing to recompile.
+
+In the global context, write the following:
+
+```nginx
+pid /var/run/new_nginx.pid;
+```
