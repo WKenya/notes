@@ -498,3 +498,48 @@ In the global context, write the following:
 ```nginx
 pid /var/run/new_nginx.pid;
 ```
+
+### Buffers and Timeouts
+
+This is a relatively complex topic, and highly related to the types of requests you will be receiving. Leave these to default values unless you know what you are doing.
+
+Buffering is the process of storing data, in RAM temporarily, between reading and writing.
+
+Timeouts are the maximum time a request send before being stopped.
+
+#### Buffer Directives
+
+Buffer directives support the following notations for data size, case insensitive:
+
+```nginx
+buffer_directive 100;  # btyes
+buffer_directive 100K; # kilobtyes
+buffer_directive 100M; # megabtyes
+```
+
+A useful directive for skipping buffering of static files is `sendfile`. This sends static files right from disk to the response.
+
+```nginx
+sendfile on;
+```
+
+To optimize this, use `tcp_nopush`.
+
+```nginx
+tcp_nopush on;
+```
+
+These make a big difference on serving static files.
+
+#### Timeout Directives
+
+Timeout directives support the following notations for time, case insensitive:
+
+```nginx
+timeout_directive 30;  # milliseconds
+timeout_directive 30s; # seconds
+timeout_directive 30m; # minutes
+timeout_directive 30h; # hours
+timeout_directive 30d; # days
+```
+
