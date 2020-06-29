@@ -543,3 +543,61 @@ timeout_directive 30h; # hours
 timeout_directive 30d; # days
 ```
 
+### Adding Dynamic Modules
+
+We can add more functionality to nginx by rebuilding from source with the modules specified at build time. This allows us to add dynamic modules to nginx.
+
+Dynamic modules are modules that are not always running, and dynamically load as directed by the configuration file, do some work, then stop.
+
+In order to build, rebuild, or upgrade nginx, download the desired source code and build it. The build process will remove any old binaries in the process.
+
+#### Upgrading nginx
+
+In order to upgrade:
+
+1. Don't change the existing configuration of the build. Run `nginx -V` to get the current configuration from the build. Copy the arguments.
+
+2. Determine which modules you would like to add to nginx. Run `./configure -help` to see the entire list.
+
+    - To find dynamic modules filter the list with `./configure --help | grep dynamic`.
+
+3. Find the dynamic module desired and add that to the configuration arguments: `... --with-http-_image_filter_module=dynamic`
+
+    - Notice the dynamic after the equals sign, that tells nginx this is a dynamic module.
+
+4. Add the module path to the configuration arguments so nginx knows where the modules are saved: `... --modules-path=/etc/nginx/modules`
+
+    - This allows us to easily reference the modules in the configuration with the relative path with `load_modules`
+
+5. Run the configuration command.
+
+    - You may get errors if you are missing any dependencies of the modules when building. Install those to continue.
+
+6. Run `make`, then `make install`.
+
+7. Run `nginx -V` to verify the new configuration is correct.
+
+8. Reload nginx and check its status to verify everything is running.
+
+#### Add Dynamic Module to Configuration
+
+Now that nginx has had the plugin built into it, we can now try using the new dynamic modules in configuration.
+
+Look at the documentation of the plugin and add the desired configuration.
+
+```nginx
+location = /thumb.png {
+    image_filter rotate 180;
+}
+```
+
+We will also need to configure nginx to load the module in the configuration before this works.
+
+In the global context, add the following:
+
+```nginx
+load_module modules/ngx_http_image_filter_module.so
+```
+
+_Note:_ Modules will end in the .so file extention.
+
