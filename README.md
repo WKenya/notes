@@ -1,2 +1,2 @@
-# Cheat-Sheets
-A collection of handy tips and tricks for a programmer
+# Notes
+My Personal note collection for software
